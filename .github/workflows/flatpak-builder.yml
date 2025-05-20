@@ -1,18 +1,33 @@
+name: Build Flatpak
+
 on:
   push:
-    branches: [master]
-name: Flatpak Build
+    branches:
+      - master
+
 jobs:
-  flatpak:
-    name: "Flatpak"
+  build:
     runs-on: ubuntu-latest
-    container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-46
-      options: --privileged
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y flatpak flatpak-builder
+
+      - name: Build and upload Flatpak
+        env:
+          APPID: "moe.nyarchlinux.assistant"
+          BUNDLENAME: "nyarchassistant.flatpak"
+        run: |
+          flatpak-builder --install --user --force-clean flatpak-app "$APPID".json
+          flatpak build-bundle ~/.local/share/flatpak/repo "$BUNDLENAME" "$APPID"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
         with:
-          bundle: nyarchassistant.flatpak
-          manifest-path: moe.nyarchlinux.assistant.json
-          cache-key: flatpak-builder-${{ github.sha }}
+          name: nyarchassistant.flatpak
+          path: nyarchassistant.flatpak

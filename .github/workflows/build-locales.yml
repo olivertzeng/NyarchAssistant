@@ -3,7 +3,7 @@ name: Rebuild Locales
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   run-script:
