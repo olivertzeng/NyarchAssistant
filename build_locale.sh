@@ -6,3 +6,4 @@ for file in $(fd -e po); do
 	msgmerge -U "$file" nyarchassistant.pot
 done
 rm -f *~
+cd ..
